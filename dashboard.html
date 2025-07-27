@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - Gym Member</title>
+</head>
+<body>
+  <h2>Welcome, <span id="user-name">Loading...</span></h2>
+  <button id="logout">Logout</button>
+
+  <hr>
+
+  <h3>Quick Actions</h3>
+  <button id="mark-attendance">Mark Attendance</button>
+  <button id="add-expense">Add Expense</button>
+
+  <div id="message"></div>
+
+  <script type="module">
+    import { auth, db } from './js/firebase-init.js';
+    import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js';
+    import { doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js';
+
+    const userNameSpan = document.getElementById('user-name');
+    const messageDiv = document.getElementById('message');
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const docRef = doc(db, "members", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          userNameSpan.textContent = data.name || "Member";
+        }
+      } else {
+        window.location.href = "login.html"; // Redirect if not logged in
+      }
+    });
+
+    document.getElementById('logout').addEventListener('click', () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    });
+
+    document.getElementById('mark-attendance').addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const ref = doc(db, "members", user.uid);
+        await updateDoc(ref, {
+          attendance: arrayUnion(serverTimestamp())
+        });
+        messageDiv.innerHTML = "✅ Attendance marked!";
+      }
+    });
+
+    document.getElementById('add-expense').addEventListener('click', async () => {
+      const amount = prompt("Enter expense amount:");
+      if (!amount || isNaN(amount)) return;
+
+      const user = auth.currentUser;
+      if (user) {
+        const ref = doc(db, "members", user.uid);
+        await updateDoc(ref, {
+          expenses: arrayUnion({
+            amount: parseFloat(amount),
+            date: new Date().toISOString()
+          })
+        });
+        messageDiv.innerHTML = "💰 Expense recorded!";
+      }
+    });
+  </script>
+</body>
+</html>

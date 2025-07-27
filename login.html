@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Gym Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h2 {
+      color: #333;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    a {
+      color: #007bff;
+    }
+
+
+  </style>
+</head>
+<body>
+  <h2>Login</h2>
+  <form id="login-form">
+    <input type="email" id="login-email" placeholder="Email" required />
+    <input type="password" id="login-password" placeholder="Password" required />
+    <button type="submit">Login</button>
+  </form>
+  
+  <p>Don't have an account? <a href="register.html">Sign Up</a></p>
+
+  <script type="module">
+    import { auth } from './js/firebase-init.js';
+    import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js';
+
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Login successful!");
+          window.location.href = "dashboard.html";
+        })
+        .catch((error) => {
+          alert("Error: " + error.message);
+        });
+    });
+  </script>
+</body>
+</html>

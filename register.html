@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - Gym Member</title>
+  <style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+  }
+  h2 {
+    color: #333;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #218838;
+  }
+  a {
+    color: #007bff;
+  }
+
+  </style>
+</head>
+<body>
+  <h2>Gym Member Registration</h2>
+  <input type="text" id="name" placeholder="Full Name"><br>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <input type="text" id="phone" placeholder="Phone"><br>
+  <button onclick="register()">Register</button>
+<p>Already  have an account <a href="login.html">Login Here</a></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
+      authDomain: "gymwebsite-5df52.firebaseapp.com",
+      projectId: "gymwebsite-5df52",
+      storageBucket: "gymwebsite-5df52.firebasestorage.app",
+      messagingSenderId: "494794343106",
+      appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
+      measurementId: "G-KJHSRY9XCC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.register = async function () {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const phone = document.getElementById("phone").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "members", user.uid), {
+          name: name,
+          email: email,
+          phone: phone,
+          joinedOn: new Date().toISOString()
+        });
+
+        alert("Registration successful!");
+        window.location.href = "login.html"; // Next page
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+  </script>
+</body>
+</html>
