@@ -1,95 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Register - Gym Member</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Club - Member Registration</title>
   <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
-  }
-  h2 {
-    color: #333;
-  }
-  input[type="text"],
-  input[type="email"],
-  input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  button {
-    padding: 10px 15px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #218838;
-  }
-  a {
-    color: #007bff;
-  }
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+        url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+      background-size: cover;
+      position: relative;
+    }
+    .container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 420px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      z-index: 2;
+      margin: 1rem;
+    }
+    .auth-form {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
 
+    h1 {
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      color: #ff5a5f;
+      margin-top: 0;
+      font-size: 1.5em;
+    }
+
+    .tagline {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #ff5a5f;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #e04a50;
+    }
+
+    .links {
+      margin-top: 20px;
+    }
+
+    .links a {
+      color: #ff5a5f;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    #error-message {
+      color: #ff5a5f;
+      margin-top: 15px;
+    }
+
+    #success-message {
+      color: #4CAF50;
+      margin-top: 15px;
+    }
   </style>
 </head>
+
 <body>
-  <h2>Gym Member Registration</h2>
-  <input type="text" id="name" placeholder="Full Name"><br>
-  <input type="email" id="email" placeholder="Email"><br>
-  <input type="password" id="password" placeholder="Password"><br>
-  <input type="text" id="phone" placeholder="Phone"><br>
-  <button onclick="register()">Register</button>
-<p>Already  have an account <a href="login.html">Login Here</a></p>
+  <div class="container">
+    <h1>Fitness Club</h1>
+    <h2>IT'S GYM TIME. LET'S GO</h2>
+    <p class="tagline">WE ARE READY TO FIT YOU</p>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    <div class="form-group">
+      <input type="text" id="name" placeholder="Full Name" required>
+    </div>
 
+    <div class="form-group">
+      <input type="email" id="email" placeholder="Email" required>
+    </div>
+
+    <div class="form-group">
+      <input type="password" id="password" placeholder="Password (min 6 characters)" required>
+    </div>
+
+    <div class="form-group">
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+    </div>
+
+    <button id="registerBtn">REGISTER</button>
+
+    <div id="error-message"></div>
+    <div id="success-message"></div>
+
+    <div class="links">
+      <p>Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script>
+    // Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
       authDomain: "gymwebsite-5df52.firebaseapp.com",
       projectId: "gymwebsite-5df52",
-      storageBucket: "gymwebsite-5df52.firebasestorage.app",
+      storageBucket: "gymwebsite-5df52.appspot.com",
       messagingSenderId: "494794343106",
       appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
       measurementId: "G-KJHSRY9XCC"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-    window.register = async function () {
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const phone = document.getElementById("phone").value;
+    document.getElementById('registerBtn').addEventListener('click', () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const name = document.getElementById('name').value;
 
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+      // Clear previous messages
+      document.getElementById('error-message').textContent = '';
+      document.getElementById('success-message').textContent = '';
 
-        await setDoc(doc(db, "members", user.uid), {
-          name: name,
-          email: email,
-          phone: phone,
-          joinedOn: new Date().toISOString()
-        });
-
-        alert("Registration successful!");
-        window.location.href = "login.html"; // Next page
-      } catch (error) {
-        alert(error.message);
+      // Validate password match
+      if (password !== confirmPassword) {
+        document.getElementById('error-message').textContent = 'Passwords do not match';
+        return;
       }
-    };
+
+      // Validate password length
+      if (password.length < 6) {
+        document.getElementById('error-message').textContent = 'Password must be at least 6 characters';
+        return;
+      }
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Update user profile with name
+          return userCredential.user.updateProfile({
+            displayName: name
+          });
+        })
+        .then(() => {
+          document.getElementById('success-message').textContent = 'Registration successful! Redirecting...';
+          setTimeout(() => {
+            window.location.href = 'member-dashboard.html';
+          }, 2000);
+        })
+        .catch((error) => {
+          document.getElementById('error-message').textContent = error.message;
+        });
+    });
   </script>
 </body>
+
 </html>
