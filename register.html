@@ -167,18 +167,12 @@
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
       const name = document.getElementById('name').value;
-
-      // Clear previous messages
       document.getElementById('error-message').textContent = '';
       document.getElementById('success-message').textContent = '';
-
-      // Validate password match
       if (password !== confirmPassword) {
         document.getElementById('error-message').textContent = 'Passwords do not match';
         return;
       }
-
-      // Validate password length
       if (password.length < 6) {
         document.getElementById('error-message').textContent = 'Password must be at least 6 characters';
         return;
@@ -194,7 +188,7 @@
         .then(() => {
           document.getElementById('success-message').textContent = 'Registration successful! Redirecting...';
           setTimeout(() => {
-            window.location.href = 'member-dashboard.html';
+            window.location.href = 'dashboard.html';
           }, 2000);
         })
         .catch((error) => {
