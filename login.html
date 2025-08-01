@@ -135,34 +135,70 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
-      authDomain: "gymwebsite-5df52.firebaseapp.com",
-      projectId: "gymwebsite-5df52",
-      storageBucket: "gymwebsite-5df52.appspot.com",
-      messagingSenderId: "494794343106",
-      appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
-      measurementId: "G-KJHSRY9XCC"
-    };
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
+    authDomain: "gymwebsite-5df52.firebaseapp.com",
+    projectId: "gymwebsite-5df52",
+    storageBucket: "gymwebsite-5df52.appspot.com",
+    messagingSenderId: "494794343106",
+    appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
+    measurementId: "G-KJHSRY9XCC"
+  };
 
-    document.getElementById('loginBtn').addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+  // Initialize Firebase services
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          // Redirect to member dashboard
-          window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-          document.getElementById('error-message').textContent = error.message;
-        });
-    });
-  </script>
+  const loginBtn = document.getElementById('loginBtn');
+  const errorMsg = document.getElementById('error-message');
+
+  loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
+
+    errorMsg.textContent = "";
+
+    try {
+      // 🔐 Sign in the user
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 🔍 Check if the member document exists
+      const memberRef = doc(db, "members", email); // email is the doc ID in your setup
+      const memberSnap = await getDoc(memberRef);
+
+      if (!memberSnap.exists()) {
+        errorMsg.textContent = "❌ You are not an authorized member. Contact admin.";
+        await signOut(auth);
+        return;
+      }
+
+      const status = memberSnap.data().membership?.status || "Pending";
+
+      if (status !== "Active") {
+        errorMsg.textContent = `⛔ Access Denied: Your membership is "${status}". Contact admin.`;
+        await signOut(auth);
+        return;
+      }
+
+      // ✅ Success: Redirect to dashboard
+      window.location.href = "dashboard.html";
+
+    } catch (error) {
+      console.error("Login error:", error);
+      errorMsg.textContent = "❌ " + (error.message || "Login failed. Please try again.");
+    }
+  });
+</script>
+
+
 </body>
 
 </html>
