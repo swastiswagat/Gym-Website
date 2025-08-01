@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Members | Admin Dashboard</title>
+</head>
+<body>
+  <h2>Registered Members</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Name</th><th>Email</th><th>Membership</th><th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="membersTableBody"></tbody>
+  </table>
+
+  <script type="module">
+    import { db } from './js/firebase-init.js';
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+
+    const tableBody = document.getElementById('membersTableBody');
+
+    const querySnapshot = await getDocs(collection(db, "members"));
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      tableBody.innerHTML += `
+        <tr>
+          <td>${data.name}</td>
+          <td>${data.email}</td>
+          <td>${data.membership}</td>
+          <td>${data.status}</td>
+        </tr>
+      `;
+    });
+  </script>
+</body>
+</html>

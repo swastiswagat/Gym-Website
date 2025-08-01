@@ -1,73 +1,517 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Dashboard - Gym Member</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Dashboard - Gym</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #ff4757;
+      --secondary: #2f3542;
+      --light: #f1f2f6;
+      --dark: #1e272e;
+      --success: #2ed573;
+      --info: #1e90ff;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1075&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--light);
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .welcome {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .welcome span {
+      color: var(--primary);
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.8rem;
+      background: var(--primary);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 71, 87, 0.6);
+    }
+    
+    .btn:active {
+      transform: translateY(-1px);
+    }
+    
+    .btn i {
+      margin-right: 8px;
+    }
+    
+    .btn-logout {
+      background: var(--secondary);
+      box-shadow: 0 4px 15px rgba(47, 53, 66, 0.4);
+    }
+    
+    .btn-logout:hover {
+      box-shadow: 0 6px 20px rgba(47, 53, 66, 0.6);
+    }
+    
+    .dashboard-section {
+      background: rgba(30, 39, 46, 0.8);
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      position: relative;
+      padding-bottom: 0.5rem;
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: var(--primary);
+    }
+    
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .data-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .card-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-desc {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .attendance-list {
+      margin-top: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .attendance-item {
+      padding: 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .attendance-item:last-child {
+      border-bottom: none;
+    }
+    
+    #message {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 1rem 2rem;
+      background: var(--success);
+      color: white;
+      border-radius: 50px;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(46, 213, 115, 0.4);
+      display: none;
+      z-index: 1000;
+      animation: slideIn 0.5s ease forwards;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .welcome {
+        font-size: 1.8rem;
+      }
+      
+      .quick-actions, .data-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>Welcome, <span id="user-name">Loading...</span></h2>
-  <button id="logout">Logout</button>
-
-  <hr>
-
-  <h3>Quick Actions</h3>
-  <button id="mark-attendance">Mark Attendance</button>
-  <button id="add-expense">Add Expense</button>
-
-  <div id="message"></div>
+  <div class="container">
+    <header>
+      <h1 class="welcome">Welcome, <span id="user-name">Member</span></h1>
+      <button id="logout" class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </header>
+    
+    <section class="dashboard-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions">
+        <div class="card">
+          <button id="mark-attendance" class="btn" style="width: 100%">
+            <i class="fas fa-calendar-check"></i> Mark Today's Attendance
+          </button>
+        </div>
+      </div>
+      
+      <h2 class="section-title">Your Stats</h2>
+      <div class="data-cards">
+        <div class="card">
+          <h3 class="card-title">Membership Status</h3>
+          <div class="card-value" id="membership-status">Active</div>
+          <p class="card-desc" id="membership-end-date">Expires: Loading...</p>
+        </div>
+        
+        <div class="card">
+          <h3 class="card-title">Total Visits</h3>
+          <div class="card-value" id="total-visits">0</div>
+          <p class="card-desc">Your gym attendance</p>
+        </div>
+        
+        <div class="card">
+          <h3 class="card-title">Recent Attendance</h3>
+          <div class="attendance-list" id="attendance-list">
+            <div class="attendance-item">
+              <span>Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <div id="message"></div>
+  </div>
 
   <script type="module">
-    import { auth, db } from './js/firebase-init.js';
-    import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js';
-    import { doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js';
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
+      authDomain: "gymwebsite-5df52.firebaseapp.com",
+      projectId: "gymwebsite-5df52",
+      storageBucket: "gymwebsite-5df52.firebasestorage.app",
+      messagingSenderId: "494794343106",
+      appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
+      measurementId: "G-KJHSRY9XCC"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM Elements
     const userNameSpan = document.getElementById('user-name');
     const messageDiv = document.getElementById('message');
+    const logoutBtn = document.getElementById('logout');
+    const markAttendanceBtn = document.getElementById('mark-attendance');
+    const membershipStatus = document.getElementById('membership-status');
+    const membershipEndDate = document.getElementById('membership-end-date');
+    const totalVisits = document.getElementById('total-visits');
+    const attendanceList = document.getElementById('attendance-list');
 
+    // Set initial loading states
+    userNameSpan.textContent = "Loading...";
+    membershipStatus.textContent = "Checking...";
+    membershipEndDate.textContent = "Expires: Loading...";
+    totalVisits.textContent = "0";
+    attendanceList.innerHTML = '<div class="attendance-item loading">Loading attendance...</div>';
+
+    // Format date
+    function formatDate(dateString) {
+      try {
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+      } catch (e) {
+        console.error("Date formatting error:", e);
+        return dateString || "N/A";
+      }
+    }
+
+    // Format Firestore timestamp
+    function formatTimestamp(timestamp) {
+      try {
+        if (!timestamp || !timestamp.toDate) return 'N/A';
+        const date = timestamp.toDate();
+        return formatDate(date);
+      } catch (e) {
+        console.error("Timestamp conversion error:", e);
+        return "N/A";
+      }
+    }
+
+    // Show message function
+    function showMessage(msg, isError = false) {
+      messageDiv.textContent = msg;
+      messageDiv.className = isError ? 'error-message' : '';
+      messageDiv.style.display = "block";
+      
+      setTimeout(() => {
+        messageDiv.style.animation = "slideIn 0.5s ease reverse forwards";
+        setTimeout(() => {
+          messageDiv.style.display = "none";
+          messageDiv.style.animation = "slideIn 0.5s ease forwards";
+        }, 500);
+      }, 3000);
+    }
+
+    // Auth State Listener with enhanced error handling
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const docRef = doc(db, "members", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          userNameSpan.textContent = data.name || "Member";
+        console.log("User logged in:", user.uid);
+        try {
+          const docRef = doc(db, "members", user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            console.log("User data:", data);
+            
+            // Update user info
+            userNameSpan.textContent = data.name || user.displayName || "Member";
+            
+            // Update membership info
+            if (data.membership) {
+              membershipStatus.textContent = data.membership.status || "Active";
+              membershipEndDate.textContent = `Expires: ${data.membership.endDate ? formatDate(data.membership.endDate) : "N/A"}`;
+            } else {
+              membershipStatus.textContent = "No membership data";
+            }
+            
+            // Update attendance info
+            if (data.attendance && Array.isArray(data.attendance)) {
+              totalVisits.textContent = data.attendance.length;
+              
+              // Display last 5 attendance records
+              attendanceList.innerHTML = '';
+              const recentAttendance = [...data.attendance]
+                .sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0))
+                .slice(0, 5);
+              
+              if (recentAttendance.length === 0) {
+                attendanceList.innerHTML = '<div class="attendance-item">No attendance records yet</div>';
+              } else {
+                recentAttendance.forEach(record => {
+                  const item = document.createElement('div');
+                  item.className = 'attendance-item';
+                  item.innerHTML = `
+                    <span>${formatTimestamp(record.date)}</span>
+                    <span>${record.type || 'Visit'}</span>
+                  `;
+                  attendanceList.appendChild(item);
+                });
+              }
+            } else {
+              totalVisits.textContent = "0";
+              attendanceList.innerHTML = '<div class="attendance-item">No attendance records found</div>';
+            }
+          } else {
+            // If document doesn't exist, create it with default values
+            console.log("Creating new member document");
+            await setDoc(docRef, {
+              name: user.displayName || "Member",
+              email: user.email || "",
+              createdAt: serverTimestamp(),
+              membership: {
+                status: "Active",
+                startDate: new Date().toISOString(),
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+              },
+              attendance: []
+            });
+            
+            // Refresh the data
+            const newDocSnap = await getDoc(docRef);
+            if (newDocSnap.exists()) {
+              const newData = newDocSnap.data();
+              userNameSpan.textContent = newData.name || "Member";
+              membershipStatus.textContent = "Active";
+              membershipEndDate.textContent = `Expires: ${formatDate(newData.membership.endDate)}`;
+            }
+            
+            showMessage("🎉 Welcome new member! Profile created.");
+          }
+        } catch (error) {
+          console.error("Error in auth state listener:", error);
+          showMessage("⚠️ Failed to load profile data", true);
+          userNameSpan.textContent = "Error loading profile";
         }
       } else {
-        window.location.href = "login.html"; // Redirect if not logged in
-      }
-    });
-
-    document.getElementById('logout').addEventListener('click', () => {
-      signOut(auth).then(() => {
         window.location.href = "login.html";
-      });
-    });
-
-    document.getElementById('mark-attendance').addEventListener('click', async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const ref = doc(db, "members", user.uid);
-        await updateDoc(ref, {
-          attendance: arrayUnion(serverTimestamp())
-        });
-        messageDiv.innerHTML = "✅ Attendance marked!";
       }
     });
 
-    document.getElementById('add-expense').addEventListener('click', async () => {
-      const amount = prompt("Enter expense amount:");
-      if (!amount || isNaN(amount)) return;
+    // Logout functionality
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Logout error:", error);
+        showMessage("⚠️ Logout failed. Please try again.", true);
+      }
+    });
 
+    // Mark attendance with enhanced error handling
+    markAttendanceBtn.addEventListener('click', async () => {
       const user = auth.currentUser;
-      if (user) {
+      if (!user) {
+        showMessage("⚠️ Please login first", true);
+        return;
+      }
+      
+      try {
         const ref = doc(db, "members", user.uid);
+        
+        // First verify the document exists
+        const docSnap = await getDoc(ref);
+        if (!docSnap.exists()) {
+          showMessage("⚠️ Member profile not found", true);
+          return;
+        }
+        
         await updateDoc(ref, {
-          expenses: arrayUnion({
-            amount: parseFloat(amount),
-            date: new Date().toISOString()
+          attendance: arrayUnion({
+            date: serverTimestamp(),
+            type: "gym_visit"
           })
         });
-        messageDiv.innerHTML = "💰 Expense recorded!";
+        
+        showMessage("✅ Attendance marked successfully!");
+        
+        // Refresh attendance data
+        const updatedDoc = await getDoc(ref);
+        if (updatedDoc.exists()) {
+          const data = updatedDoc.data();
+          if (data.attendance) {
+            totalVisits.textContent = data.attendance.length;
+            
+            // Update the attendance list with the new record
+            attendanceList.innerHTML = '';
+            const recentAttendance = [...data.attendance]
+              .sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0))
+              .slice(0, 5);
+            
+            recentAttendance.forEach(record => {
+              const item = document.createElement('div');
+              item.className = 'attendance-item';
+              item.innerHTML = `
+                <span>${formatTimestamp(record.date)}</span>
+                <span>${record.type || 'Visit'}</span>
+              `;
+              attendanceList.appendChild(item);
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error marking attendance:", error);
+        let errorMsg = "⚠️ Failed to mark attendance";
+        
+        // More specific error messages
+        if (error.code === 'permission-denied') {
+          errorMsg = "⚠️ Permission denied. Check Firestore rules";
+        } else if (error.code === 'not-found') {
+          errorMsg = "⚠️ Member document not found";
+        }
+        
+        showMessage(errorMsg, true);
       }
     });
   </script>

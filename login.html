@@ -156,7 +156,7 @@
       auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
           // Redirect to member dashboard
-          window.location.href = 'member-dashboard.html';
+          window.location.href = 'dashboard.html';
         })
         .catch((error) => {
           document.getElementById('error-message').textContent = error.message;

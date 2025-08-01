@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Member - Fitness Club</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+        url('https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+      background-size: cover;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #ff5a5f;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 1rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    button {
+      background: #ff5a5f;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 1.5rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e0484c;
+    }
+
+    .msg {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
+      display: none;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="form-container">
+    <h2>Add New Member</h2>
+    <form id="memberForm">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
+
+      <label for="phone">Phone Number</label>
+      <input type="text" id="phone" required />
+
+      <label for="membership">Membership Package</label>
+      <select id="membership" required>
+        <option value="">-- Select Package --</option>
+        <option value="Basic">Basic (₹1000/month)</option>
+        <option value="Standard">Prime (₹1700/month)</option>
+        <option value="Premium">Premium (₹4000/month)</option>
+      </select>
+
+      <button type="submit">Add Member</button>
+    </form>
+    <div class="msg" id="formMsg"></div>
+  </div>
+
+  <script type="module">
+    import { db } from './js/firebase-init.js';
+    import {
+      doc,
+      setDoc,
+      getDoc,
+      serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js';
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const memberForm = document.getElementById('memberForm');
+      const formMsg = document.getElementById('formMsg');
+
+      memberForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const phone = document.getElementById('phone').value.trim();
+        const membership = document.getElementById('membership').value.trim();
+
+        formMsg.style.display = 'block';
+
+        if (!email.includes("@")) {
+          formMsg.textContent = "❌ Please enter a valid email.";
+          formMsg.className = "msg error";
+          return;
+        }
+
+        const memberRef = doc(db, "members", email);
+
+        try {
+          const existing = await getDoc(memberRef);
+          if (existing.exists()) {
+            formMsg.textContent = "⚠️ Member with this email already exists.";
+            formMsg.className = "msg error";
+            return;
+          }
+
+          await setDoc(memberRef, {
+            name,
+            email,
+            phone,
+            membership: {
+              package: membership,
+              status: "Pending",
+              startDate: null,
+              endDate: null
+            },
+            attendance: [],
+            createdAt: serverTimestamp()
+          });
+
+          formMsg.textContent = "✅ Member added successfully!";
+          formMsg.className = "msg success";
+          memberForm.reset();
+        } catch (err) {
+          console.error("Firestore error:", err);
+          formMsg.textContent = "❌ Error adding member: " + err.message;
+          formMsg.className = "msg error";
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

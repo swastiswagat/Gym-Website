@@ -147,55 +147,91 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-  <script>
-    // Initialize Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
-      authDomain: "gymwebsite-5df52.firebaseapp.com",
-      projectId: "gymwebsite-5df52",
-      storageBucket: "gymwebsite-5df52.appspot.com",
-      messagingSenderId: "494794343106",
-      appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
-      measurementId: "G-KJHSRY9XCC"
-    };
+  <script type="module">
+  // Firebase modular imports
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+  const firebaseConfig = {
+    apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
+    authDomain: "gymwebsite-5df52.firebaseapp.com",
+    projectId: "gymwebsite-5df52",
+    storageBucket: "gymwebsite-5df52.appspot.com",
+    messagingSenderId: "494794343106",
+    appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
+    measurementId: "G-KJHSRY9XCC"
+  };
 
-    document.getElementById('registerBtn').addEventListener('click', () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const name = document.getElementById('name').value;
-      document.getElementById('error-message').textContent = '';
-      document.getElementById('success-message').textContent = '';
-      if (password !== confirmPassword) {
-        document.getElementById('error-message').textContent = 'Passwords do not match';
+  // Init Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // DOM elements
+  const registerBtn = document.getElementById('registerBtn');
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const errorMsg = document.getElementById('error-message');
+  const successMsg = document.getElementById('success-message');
+
+  registerBtn.addEventListener('click', async () => {
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    errorMsg.textContent = '';
+    successMsg.textContent = '';
+
+    if (!name || !email || !password || !confirmPassword) {
+      errorMsg.textContent = "All fields are required.";
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      errorMsg.textContent = "Passwords do not match.";
+      return;
+    }
+
+    if (password.length < 6) {
+      errorMsg.textContent = "Password must be at least 6 characters.";
+      return;
+    }
+
+    try {
+      // Check if this email exists in Firestore
+      const docRef = doc(db, "members", email);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        errorMsg.textContent = "❌ You are not a registered gym member. Please contact admin.";
         return;
       }
-      if (password.length < 6) {
-        document.getElementById('error-message').textContent = 'Password must be at least 6 characters';
-        return;
-      }
 
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          // Update user profile with name
-          return userCredential.user.updateProfile({
-            displayName: name
-          });
-        })
-        .then(() => {
-          document.getElementById('success-message').textContent = 'Registration successful! Redirecting...';
-          setTimeout(() => {
-            window.location.href = 'dashboard.html';
-          }, 2000);
-        })
-        .catch((error) => {
-          document.getElementById('error-message').textContent = error.message;
-        });
-    });
-  </script>
+      // Create Firebase Auth account
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Update display name
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
+
+      successMsg.textContent = "✅ Registration successful! Redirecting...";
+
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 2000);
+
+    } catch (error) {
+      console.error("Registration error:", error);
+      errorMsg.textContent = error.message;
+    }
+  });
+</script>
+
 </body>
 
 </html>

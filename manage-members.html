@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Members</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(to right, #232526, #414345);
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff5a5f;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .member-card {
+      background-color: #fff;
+      color: #333;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .member-card h3 {
+      margin-top: 0;
+      color: #ff5a5f;
+    }
+
+    .member-card p {
+      margin: 0.5rem 0;
+    }
+
+    .controls {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    select, input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      flex: 1;
+    }
+
+    button {
+      background-color: #ff5a5f;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #e0484c;
+    }
+
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Manage Gym Members</h1>
+    <div id="membersContainer"></div>
+  </div>
+
+  <script type="module">
+    import { db } from './js/firebase-init.js';
+    import {
+      collection,
+      getDocs,
+      updateDoc,
+      doc
+    } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js';
+
+    const membersContainer = document.getElementById('membersContainer');
+
+    async function loadMembers() {
+      const snapshot = await getDocs(collection(db, "members"));
+      membersContainer.innerHTML = "";
+
+      snapshot.forEach(docSnap => {
+        const member = docSnap.data();
+        const id = docSnap.id;
+
+        const card = document.createElement('div');
+        card.className = "member-card";
+        card.innerHTML = `
+          <h3>${member.name} (${member.email})</h3>
+          <p><strong>Package:</strong> ${member.membership?.package || 'N/A'}</p>
+          <p><strong>Status:</strong> ${member.membership?.status || 'Pending'}</p>
+          <p><strong>Start Date:</strong> ${member.membership?.startDate || 'N/A'}</p>
+          <p><strong>End Date:</strong> ${member.membership?.endDate || 'N/A'}</p>
+          <p><strong>Alert:</strong> ${member.alert || 'None'}</p>
+
+          <div class="controls">
+            <select id="select-${id}">
+              <option value="Active">Active</option>
+              <option value="Hold">Hold</option>
+            </select>
+            <input type="text" id="msg-${id}" placeholder="Enter alert message..." />
+            <button onclick="updateMember('${id}')">Update</button>
+          </div>
+        `;
+        membersContainer.appendChild(card);
+      });
+    }
+
+    window.updateMember = async function (id) {
+      const status = document.getElementById(`select-${id}`).value;
+      const msg = document.getElementById(`msg-${id}`).value;
+
+      const today = new Date();
+      const startDate = today.toISOString().split('T')[0];
+
+      const endDate = new Date(today);
+      endDate.setDate(today.getDate() + 30);
+      const endDateFormatted = endDate.toISOString().split('T')[0];
+
+      const updateData = {
+        "membership.status": status,
+        alert: msg
+      };
+
+      if (status === "Active") {
+        updateData["membership.startDate"] = startDate;
+        updateData["membership.endDate"] = endDateFormatted;
+      }
+
+      try {
+        const ref = doc(db, "members", id);
+        await updateDoc(ref, updateData);
+        alert("✅ Member updated successfully!");
+        loadMembers(); // Refresh the list
+      } catch (err) {
+        console.error("Update failed:", err.message);
+        alert("❌ Error updating member.");
+      }
+    };
+
+    loadMembers();
+  </script>
+</body>
+</html>
