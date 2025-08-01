@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diet Plans - Gym Admin</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff9f43;
+      margin-bottom: 25px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff9f43;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #e88b2c;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Assign Diet Plan</h2>
+    <form action="https://formspree.io/f/mblkarkg" method="POST">
+      <label for="email">Member Email</label>
+      <input type="email" name="Member Email" id="email" required>
+
+      <label for="goal">Fitness Goal</label>
+      <select name="Fitness Goal" id="goal" required>
+        <option value="">Select</option>
+        <option value="Weight Loss">Weight Loss</option>
+        <option value="Muscle Gain">Muscle Gain</option>
+        <option value="Maintenance">Maintenance</option>
+      </select>
+
+      <label for="plan">Diet Plan Details</label>
+      <textarea name="Diet Plan" id="plan" rows="6" required></textarea>
+
+      <button type="submit">Assign Plan</button>
+    </form>
+  </div>
+
+</body>
+</html>

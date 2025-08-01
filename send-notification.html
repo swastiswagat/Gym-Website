@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Send Notification - Gym Admin</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #1e90ff;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background-color: #1e90ff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #187bcd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Send Notification to Member</h2>
+
+    <form action="https://formspree.io/f/mblkarkg" method="POST">
+      <label for="recipient">Recipient Email</label>
+      <input type="email" name="Recipient Email" id="recipient" required>
+
+      <label for="subject">Subject</label>
+      <input type="text" name="Subject" id="subject" required>
+
+      <label for="message">Message</label>
+      <textarea name="Message" id="message" rows="6" required></textarea>
+
+      <button type="submit">Send Notification</button>
+    </form>
+  </div>
+
+</body>
+</html>

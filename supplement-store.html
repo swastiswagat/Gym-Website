@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Supplement Store - Gym Admin</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #20bf6b;
+      margin-bottom: 25px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background-color: #20bf6b;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #119c54;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Supplement Inventory Form</h2>
+    <form action="https://formspree.io/f/mblkarkg" method="POST">
+      <label for="name">Supplement Name</label>
+      <input type="text" name="Supplement Name" id="name" required>
+
+      <label for="type">Type</label>
+      <input type="text" name="Type" id="type" placeholder="Protein, Creatine, etc." required>
+
+      <label for="quantity">Quantity in Stock</label>
+      <input type="number" name="Quantity" id="quantity" required>
+
+      <label for="price">Price (₹)</label>
+      <input type="number" name="Price" id="price" required>
+
+      <label for="notes">Notes</label>
+      <textarea name="Notes" id="notes" rows="4" placeholder="Optional"></textarea>
+
+      <button type="submit">Add to Inventory</button>
+    </form>
+  </div>
+
+</body>
+</html>

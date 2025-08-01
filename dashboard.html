@@ -276,242 +276,134 @@
   </div>
 
   <script type="module">
-    // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+    import {
+      getFirestore, doc, getDoc, setDoc,
+      updateDoc, arrayUnion, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
 
-    // Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
       authDomain: "gymwebsite-5df52.firebaseapp.com",
       projectId: "gymwebsite-5df52",
-      storageBucket: "gymwebsite-5df52.firebasestorage.app",
+      storageBucket: "gymwebsite-5df52.appspot.com",
       messagingSenderId: "494794343106",
       appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
       measurementId: "G-KJHSRY9XCC"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // DOM Elements
     const userNameSpan = document.getElementById('user-name');
-    const messageDiv = document.getElementById('message');
     const logoutBtn = document.getElementById('logout');
     const markAttendanceBtn = document.getElementById('mark-attendance');
     const membershipStatus = document.getElementById('membership-status');
     const membershipEndDate = document.getElementById('membership-end-date');
     const totalVisits = document.getElementById('total-visits');
     const attendanceList = document.getElementById('attendance-list');
+    const messageDiv = document.getElementById('message');
 
-    // Set initial loading states
-    userNameSpan.textContent = "Loading...";
-    membershipStatus.textContent = "Checking...";
-    membershipEndDate.textContent = "Expires: Loading...";
-    totalVisits.textContent = "0";
-    attendanceList.innerHTML = '<div class="attendance-item loading">Loading attendance...</div>';
-
-    // Format date
     function formatDate(dateString) {
+      if (!dateString) return "N/A";
       try {
-        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
-      } catch (e) {
-        console.error("Date formatting error:", e);
-        return dateString || "N/A";
+        return new Date(dateString).toLocaleDateString('en-US', {
+          weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+        });
+      } catch {
+        return "Invalid Date";
       }
     }
 
-    // Format Firestore timestamp
-    function formatTimestamp(timestamp) {
-      try {
-        if (!timestamp || !timestamp.toDate) return 'N/A';
-        const date = timestamp.toDate();
-        return formatDate(date);
-      } catch (e) {
-        console.error("Timestamp conversion error:", e);
-        return "N/A";
-      }
+    function formatTimestamp(ts) {
+      return ts?.toDate ? formatDate(ts.toDate()) : "N/A";
     }
 
-    // Show message function
     function showMessage(msg, isError = false) {
+      messageDiv.style.background = isError ? "#ff4757" : "#2ed573";
       messageDiv.textContent = msg;
-      messageDiv.className = isError ? 'error-message' : '';
       messageDiv.style.display = "block";
-      
-      setTimeout(() => {
-        messageDiv.style.animation = "slideIn 0.5s ease reverse forwards";
-        setTimeout(() => {
-          messageDiv.style.display = "none";
-          messageDiv.style.animation = "slideIn 0.5s ease forwards";
-        }, 500);
-      }, 3000);
+      setTimeout(() => { messageDiv.style.display = "none"; }, 4000);
     }
 
-    // Auth State Listener with enhanced error handling
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        console.log("User logged in:", user.uid);
-        try {
-          const docRef = doc(db, "members", user.uid);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            console.log("User data:", data);
-            
-            // Update user info
-            userNameSpan.textContent = data.name || user.displayName || "Member";
-            
-            // Update membership info
-            if (data.membership) {
-              membershipStatus.textContent = data.membership.status || "Active";
-              membershipEndDate.textContent = `Expires: ${data.membership.endDate ? formatDate(data.membership.endDate) : "N/A"}`;
-            } else {
-              membershipStatus.textContent = "No membership data";
-            }
-            
-            // Update attendance info
-            if (data.attendance && Array.isArray(data.attendance)) {
-              totalVisits.textContent = data.attendance.length;
-              
-              // Display last 5 attendance records
-              attendanceList.innerHTML = '';
-              const recentAttendance = [...data.attendance]
-                .sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0))
-                .slice(0, 5);
-              
-              if (recentAttendance.length === 0) {
-                attendanceList.innerHTML = '<div class="attendance-item">No attendance records yet</div>';
-              } else {
-                recentAttendance.forEach(record => {
-                  const item = document.createElement('div');
-                  item.className = 'attendance-item';
-                  item.innerHTML = `
-                    <span>${formatTimestamp(record.date)}</span>
-                    <span>${record.type || 'Visit'}</span>
-                  `;
-                  attendanceList.appendChild(item);
-                });
-              }
-            } else {
-              totalVisits.textContent = "0";
-              attendanceList.innerHTML = '<div class="attendance-item">No attendance records found</div>';
-            }
-          } else {
-            // If document doesn't exist, create it with default values
-            console.log("Creating new member document");
-            await setDoc(docRef, {
-              name: user.displayName || "Member",
-              email: user.email || "",
-              createdAt: serverTimestamp(),
-              membership: {
-                status: "Active",
-                startDate: new Date().toISOString(),
-                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
-              },
-              attendance: []
-            });
-            
-            // Refresh the data
-            const newDocSnap = await getDoc(docRef);
-            if (newDocSnap.exists()) {
-              const newData = newDocSnap.data();
-              userNameSpan.textContent = newData.name || "Member";
-              membershipStatus.textContent = "Active";
-              membershipEndDate.textContent = `Expires: ${formatDate(newData.membership.endDate)}`;
-            }
-            
-            showMessage("🎉 Welcome new member! Profile created.");
-          }
-        } catch (error) {
-          console.error("Error in auth state listener:", error);
-          showMessage("⚠️ Failed to load profile data", true);
-          userNameSpan.textContent = "Error loading profile";
+      if (!user) return (window.location.href = "login.html");
+      const uid = user.uid;
+      const ref = doc(db, "members", uid);
+
+      try {
+        let snap = await getDoc(ref);
+        if (!snap.exists()) {
+          await setDoc(ref, {
+            name: user.displayName || "Member",
+            email: user.email,
+            createdAt: serverTimestamp(),
+            membership: {
+              status: "Pending",
+              startDate: new Date().toISOString(),
+              endDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString()
+            },
+            attendance: []
+          });
+          snap = await getDoc(ref);
+          showMessage("🎉 Welcome! Profile created.");
         }
-      } else {
-        window.location.href = "login.html";
+
+        const data = snap.data();
+        userNameSpan.textContent = data.name || "Member";
+        const mem = data.membership || {};
+        membershipStatus.textContent = mem.status || "Pending";
+        membershipEndDate.textContent = `Expires: ${formatDate(mem.endDate)}`;
+
+        const attendance = Array.isArray(data.attendance) ? data.attendance : [];
+        totalVisits.textContent = attendance.length;
+        attendanceList.innerHTML = "";
+
+        if (attendance.length === 0) {
+          attendanceList.innerHTML = '<div class="attendance-item">No attendance records yet</div>';
+        } else {
+          attendance.sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0))
+            .slice(0, 5)
+            .forEach((record) => {
+              const div = document.createElement("div");
+              div.className = "attendance-item";
+              div.innerHTML = `<span>${formatTimestamp(record.date)}</span> <span>${record.type || 'Visit'}</span>`;
+              attendanceList.appendChild(div);
+            });
+        }
+      } catch (err) {
+        console.error("Error:", err.message);
+        showMessage("⚠️ Error loading data", true);
       }
     });
 
-    // Logout functionality
     logoutBtn.addEventListener('click', async () => {
       try {
         await signOut(auth);
         window.location.href = "login.html";
-      } catch (error) {
-        console.error("Logout error:", error);
-        showMessage("⚠️ Logout failed. Please try again.", true);
+      } catch (err) {
+        showMessage("⚠️ Logout failed", true);
       }
     });
 
-    // Mark attendance with enhanced error handling
     markAttendanceBtn.addEventListener('click', async () => {
       const user = auth.currentUser;
-      if (!user) {
-        showMessage("⚠️ Please login first", true);
-        return;
-      }
-      
+      if (!user) return showMessage("⚠️ Not authenticated", true);
       try {
         const ref = doc(db, "members", user.uid);
-        
-        // First verify the document exists
-        const docSnap = await getDoc(ref);
-        if (!docSnap.exists()) {
-          showMessage("⚠️ Member profile not found", true);
-          return;
-        }
-        
         await updateDoc(ref, {
           attendance: arrayUnion({
             date: serverTimestamp(),
             type: "gym_visit"
           })
         });
-        
-        showMessage("✅ Attendance marked successfully!");
-        
-        // Refresh attendance data
-        const updatedDoc = await getDoc(ref);
-        if (updatedDoc.exists()) {
-          const data = updatedDoc.data();
-          if (data.attendance) {
-            totalVisits.textContent = data.attendance.length;
-            
-            // Update the attendance list with the new record
-            attendanceList.innerHTML = '';
-            const recentAttendance = [...data.attendance]
-              .sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0))
-              .slice(0, 5);
-            
-            recentAttendance.forEach(record => {
-              const item = document.createElement('div');
-              item.className = 'attendance-item';
-              item.innerHTML = `
-                <span>${formatTimestamp(record.date)}</span>
-                <span>${record.type || 'Visit'}</span>
-              `;
-              attendanceList.appendChild(item);
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error marking attendance:", error);
-        let errorMsg = "⚠️ Failed to mark attendance";
-        
-        // More specific error messages
-        if (error.code === 'permission-denied') {
-          errorMsg = "⚠️ Permission denied. Check Firestore rules";
-        } else if (error.code === 'not-found') {
-          errorMsg = "⚠️ Member document not found";
-        }
-        
-        showMessage(errorMsg, true);
+        showMessage("✅ Attendance marked!");
+        location.reload(); // Refresh data
+      } catch (err) {
+        console.error("Attendance error:", err.message);
+        showMessage("⚠️ Could not mark attendance", true);
       }
     });
   </script>
