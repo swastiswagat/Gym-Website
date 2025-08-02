@@ -1,148 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Register - Fitness Club</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1581009137042-c552e485697a?auto=format&fit=crop&w=1350&q=80') no-repeat center center;
-      background-size: cover;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .form-container {
-      background-color: rgba(255,255,255,0.95);
-      padding: 2rem;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
-    h2 {
-      text-align: center;
-      color: #ff5a5f;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      width: 100%;
-      background: #ff5a5f;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-top: 10px;
-    }
-    button:hover {
-      background: #e0484c;
-    }
-    .message {
-      margin-top: 1rem;
-      text-align: center;
-      font-weight: bold;
-    }
-    .success { color: green; }
-    .error { color: red; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Club - Admin Portal</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .admin-card h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-card h2 {
+            color: #ff5a5f;
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+
+        .admin-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .admin-form button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .admin-form button:hover {
+            background: #111;
+        }
+
+        #admin-error {
+            color: #ff5a5f;
+            background: rgba(255, 90, 95, 0.1);
+            padding: 12px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #ff5a5f;
+            display: none;
+        }
+
+        .admin-footer {
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .admin-footer a {
+            color: #ff5a5f;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="form-container">
-    <h2>Register Member</h2>
-    <input type="text" id="name" placeholder="Full Name" required />
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <input type="text" id="phone" placeholder="Phone Number" required />
-    <button id="registerBtn">Register</button>
-    <div class="message" id="formMsg"></div>
-  </div>
+    <div class="admin-card">
+        <h1>Fitness Club</h1>
+        <h2>ADMIN PORTAL</h2>
+        
+        <form class="admin-form" id="adminLoginForm">
+            <input type="email" id="adminEmail" placeholder="Admin Email" required>
+            <input type="password" id="adminPassword" placeholder="Password" required>
+            <div id="admin-error"></div>
+            <button type="submit">ACCESS DASHBOARD</button>
+        </form>
+        
+        <div class="admin-footer">
+            <p><a href="login.html">← Back to Member Login</a></p>
+        </div>
+    </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore.js";
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
+            authDomain: "gymwebsite-5df52.firebaseapp.com",
+            projectId: "gymwebsite-5df52",
+            storageBucket: "gymwebsite-5df52.appspot.com",
+            messagingSenderId: "494794343106",
+            appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
+            measurementId: "G-KJHSRY9XCC"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const ADMIN_EMAILS = [
+            "admin123@gmail.com",
+            "manager123@gmail.com"
+        ];
+        function getAdminError(error) {
+            switch(error.code) {
+                case 'auth/invalid-email':
+                    return "Invalid admin email format";
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                    return "Invalid admin credentials";
+                case 'auth/too-many-requests':
+                    return "Too many attempts. Try again later.";
+                default:
+                    return "Admin access denied";
+            }
+        }
+        document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorEl = document.getElementById('admin-error');
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBXKiAKmQXJxxYJdBMiF7nuSkNXrotEW1I",
-      authDomain: "gymwebsite-5df52.firebaseapp.com",
-      projectId: "gymwebsite-5df52",
-      storageBucket: "gymwebsite-5df52.appspot.com",
-      messagingSenderId: "494794343106",
-      appId: "1:494794343106:web:5d9e7ca706286878c3b15b",
-      measurementId: "G-KJHSRY9XCC"
-    };
+            errorEl.style.display = 'none';
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const formMsg = document.getElementById("formMsg");
-
-    document.getElementById("registerBtn").addEventListener("click", async () => {
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim().toLowerCase();
-      const password = document.getElementById("password").value;
-      const phone = document.getElementById("phone").value.trim();
-
-      formMsg.textContent = "";
-      formMsg.className = "message";
-
-      if (!name || !email || !password || !phone) {
-        formMsg.textContent = "❌ All fields are required.";
-        formMsg.classList.add("error");
-        return;
-      }
-
-      try {
-        // Step 1: Register the user
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        // Step 2: Add Firestore member data
-        await setDoc(doc(db, "members", email), {
-          name,
-          email,
-          phone,
-          membership: {
-            package: "None",
-            status: "Pending",
-            startDate: null,
-            endDate: null
-          },
-          attendance: [],
-          createdAt: serverTimestamp()
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    if (ADMIN_EMAILS.includes(userCredential.user.email)) {
+                        window.location.href = "admin-dashboard.html";
+                    } else {
+                        firebase.auth().signOut();
+                        showError("Access restricted to authorized personnel");
+                    }
+                })
+                .catch((error) => {
+                    showError(getAdminError(error));
+                });
         });
 
-        // Step 3: Logout immediately (since member is inactive)
-        await signOut(auth);
-
-        formMsg.textContent = "✅ Registered! Admin will activate your account.";
-        formMsg.classList.add("success");
-        document.getElementById("name").value = "";
-        document.getElementById("email").value = "";
-        document.getElementById("password").value = "";
-        document.getElementById("phone").value = "";
-
-      } catch (err) {
-        console.error("Registration error:", err);
-        formMsg.textContent = "❌ " + err.message;
-        formMsg.classList.add("error");
-      }
-    });
-  </script>
+        function showError(message) {
+            const errorEl = document.getElementById('admin-error');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
