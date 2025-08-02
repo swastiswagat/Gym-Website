@@ -42,15 +42,14 @@
 ## 📷 Screenshots
 
 ### 🖼️ Home Page
-![Home](<img width="1900" height="868" alt="image" src="https://github.com/user-attachments/assets/ee08cb34-7ed5-4b4c-bff0-762c08d28e87" />
-)
+<img width="1900" height="868" alt="image" src="https://github.com/user-attachments/assets/ee08cb34-7ed5-4b4c-bff0-762c08d28e87" />
 
 ### 🖼️ Members Section
-![Classes](<img width="1897" height="877" alt="image" src="https://github.com/user-attachments/assets/852fe88b-a3d5-4ea2-93f7-f0cf7f2ac7cd" />
-)
+<img width="1897" height="877" alt="image" src="https://github.com/user-attachments/assets/852fe88b-a3d5-4ea2-93f7-f0cf7f2ac7cd" />
 
 ### 🖼️ Admin Section
-![Trainers](screenshots/trainers.png)
+<img width="1912" height="844" alt="image" src="https://github.com/user-attachments/assets/17653bfd-4f48-4dc9-903b-27eeefd68d30" />
+
 
 ---
 
